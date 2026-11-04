@@ -1,9 +1,10 @@
+import { sortRows } from '../digest/read.js';
 import type { Digest } from '../digest/types.js';
 
 const dash = '—';
 
 export function DigestPage({ digest }: { digest: Digest }) {
-  const rows = [...digest.rows].sort((a, b) => (a.job < b.job ? -1 : a.job > b.job ? 1 : 0));
+  const rows = sortRows(digest.rows);
   return (
     <>
       <h1>digest · {digest.night}</h1>

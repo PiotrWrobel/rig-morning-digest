@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { loadConfig, type RigConfig } from './config.js';
 import { lane } from './lane.js';
 import { readStatus } from './status.js';
-import { readNight } from './digest/read.js';
+import { readNight, sortRows } from './digest/read.js';
 import { Layout } from './views/layout.js';
 import { DigestPage } from './views/digest.js';
 import { StatusBoard } from './views/status.js';
@@ -35,6 +35,19 @@ export function createApp(config: RigConfig = loadConfig()) {
         <DigestPage digest={digest} />
       </Layout>,
     );
+  });
+
+  app.get('/api/digest/:night', (c) => {
+    const night = c.req.param('night');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(night)) return c.notFound();
+    let digest;
+    try {
+      digest = readNight(config.runsDir, night);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') return c.notFound();
+      throw err;
+    }
+    return c.json({ ...digest, rows: sortRows(digest.rows) });
   });
 
   return app;

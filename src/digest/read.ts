@@ -71,3 +71,8 @@ export const readNight: ReadNight = (runsDir, night): Digest => {
 
   return { night, rows: [...rows.values()], badLines };
 };
+
+// Page order: by job name. Shared so the page and the JSON cannot drift.
+export function sortRows(rows: readonly DigestRow[]): DigestRow[] {
+  return [...rows].sort((a, b) => (a.job < b.job ? -1 : a.job > b.job ? 1 : 0));
+}
