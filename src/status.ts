@@ -19,8 +19,9 @@ export function nightCounts(runsDir: string, night: string): NightCounts | null 
     const counts = { ok: 0, retry: 0, fail: 0 };
     for (const row of readNight(runsDir, night).rows) counts[row.lastStatus]++;
     return counts;
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return null;
+    throw error;
   }
 }
 
